@@ -24,3 +24,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // });
 Route::get('file',[FileController::class,'index']);
 Route::post('file',[FileController::class,'store']);
+Route::get('file/{file}',[FileController::class,'show']);
+Route::post('file/{file}',[FileController::class,'update']);

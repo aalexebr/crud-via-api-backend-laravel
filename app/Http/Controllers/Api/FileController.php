@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\File; 
-// use App\Http\Requests\StoreFileRequest;
-// use App\Http\Requests\UpdateFileRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreFileRequest;
+use App\Http\Requests\UpdateFileRequest;
+// use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+
+// helpers
 use Illuminate\Support\Facades\Storage;
 
 
@@ -17,7 +19,7 @@ class FileController extends Controller
      */
     public function index()
     {
-        $obj = 'hello';
+        $obj = File::all();
         if($obj){
             return response()->json([
                 'success'=>true,
@@ -44,11 +46,16 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreFileRequest $request)
     {
         $formData = $request->all();
-        $file = $request->file('file');
-        $fileStored = Storage::put('file_upload',$file);
+        if($request->file('file')){
+            $file = $request->file('file');
+            $fileStored = Storage::put('file_upload',$file);
+        }
+        else{
+            $fileStored = null;
+        }
         $newFile = new File();
         $newFile->file_path = $fileStored;
         $newFile->name = $formData['name'];
@@ -56,13 +63,13 @@ class FileController extends Controller
         if($res){
             return response()->json([
                         'success'=>true,
-                        'results'=> 'successful file upload'
+                        'message'=> 'successful file upload'
                     ],200);
         }
         else{
             return response()->json([
                 'success'=>false,
-                'results'=> 'unsuccessful file upload'
+                'message'=> 'unsuccessful file upload'
             ]);
         }
         
@@ -73,7 +80,18 @@ class FileController extends Controller
      */
     public function show(File $file)
     {
-        //
+        if($file){
+            return response()->json([
+                        'success'=>true,
+                        'result'=> $file
+                    ],200);
+        }
+        else{
+            return response()->json([
+                'success'=>false,
+                'message'=> 'unsuccessful file upload'
+            ]);
+        }
     }
 
     /**
@@ -87,7 +105,7 @@ class FileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, File $file)
+    public function update(UpdateFileRequest $request, File $file)
     {
         //
     }
