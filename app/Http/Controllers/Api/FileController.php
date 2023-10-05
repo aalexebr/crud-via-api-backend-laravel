@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\File; 
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\UpdateFileRequest;
-// use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 // helpers
@@ -105,9 +105,41 @@ class FileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateFileRequest $request, File $file)
+    public function update(Request $request, string $id)
     {
-        //
+        $obj = File::findOrFail($id);
+        $formData = $request->all();
+        // dealing with the file 
+        if($request->file('file') && $formData['remove'] = false){
+            if($obj->file_path){
+                Storage::delete($obj->file_path);
+            }
+            $file = $request->file('file');
+            $fileStored = Storage::put('file_upload',$file);
+        }
+        elseif($formData['remove'] = true){
+            if($obj->file_path){
+                Storage::delete($obj->file_path);
+            }
+            $fileStored = null;
+        }
+
+        // // saving the new data
+        $obj->name = $formData['name'];
+        $obj->file_path = $fileStored;
+        $res = $obj->save();
+        if($res){
+            return response()->json([
+                        'success'=>true,
+                        'message'=> 'successful file upload'
+                    ],200);
+        }
+        else{
+            return response()->json([
+                'success'=>false,
+                'message'=> 'unsuccessful file upload'
+            ]);
+        }
     }
 
     /**
@@ -115,6 +147,9 @@ class FileController extends Controller
      */
     public function destroy(File $file)
     {
-        //
+        if($file->file_path){
+            Storage::delete($file->file_path);
+        }
+        $file->delete();
     }
 }

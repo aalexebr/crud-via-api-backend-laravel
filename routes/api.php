@@ -26,3 +26,5 @@ Route::get('file',[FileController::class,'index']);
 Route::post('file',[FileController::class,'store']);
 Route::get('file/{file}',[FileController::class,'show']);
 Route::post('file/{file}',[FileController::class,'update']);
+Route::delete('file/{file}',[FileController::class,'destroy']);
+// Route::resource('files',FileController::class);
